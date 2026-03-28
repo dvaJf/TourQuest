@@ -206,22 +206,15 @@ def complete_point(request, tour_id, point_id):
         messages.error(request, 'Эта точка еще не доступна. Сначала пройдите предыдущие точки.')
         return redirect('point_detail', point_id=point_id)
 
-    # ПРОВЕРЯЕМ, ПРОХОДИЛ ЛИ ПОЛЬЗОВАТЕЛЬ ЭТОТ ТУР РАНЬШЕ (любой завершенный)
     has_completed_before = UserTour.objects.filter(
         user=request.user,
         tour=tour,
         status='completed'
     ).exclude(id=user_tour.id).exists()
-    
-    # Если проходил раньше, отмечаем текущий тур как без наград
     if has_completed_before:
         user_tour.rewards_given = True
         user_tour.save(update_fields=['rewards_given'])
-
-    # Отмечаем точку как пройденную
     next_point = user_tour.complete_current_point()
-
-    # НАЧИСЛЯЕМ МОНЕТЫ ЗА ТОЧКУ (только если награды еще не выданы)
     profile = get_or_create_profile(request.user)
     
     if not user_tour.rewards_given:
@@ -235,14 +228,12 @@ def complete_point(request, tour_id, point_id):
         messages.success(request, f'Следующая точка: "{next_point.name}"')
         return redirect('active_tour', tour_id=tour.id)
     else:
-        # Тур завершен
         if not user_tour.rewards_given:
             profile.balance += POINTS_PER_TOUR
             profile.save()
             user_tour.rewards_given = True
             user_tour.save(update_fields=['rewards_given'])
-        
-        # Считаем общее время тура
+
         duration = timezone.now() - user_tour.started_at
         hours = int(duration.total_seconds() // 3600)
         minutes = int((duration.total_seconds() % 3600) // 60)
@@ -262,12 +253,9 @@ def complete_point(request, tour_id, point_id):
 
 @login_required
 def tour_complete(request):
-    """Страница поздравления после завершения тура"""
-    # Получаем данные из сессии
     data = request.session.get('tour_complete')
     
     if not data:
-        # Если нет данных в сессии, проверяем последний завершённый тур
         last_tour = UserTour.objects.filter(
             user=request.user,
             status='completed'
@@ -285,8 +273,7 @@ def tour_complete(request):
             'tour_bonus': POINTS_PER_TOUR,
             'points_bonus': tour.points.count() * POINTS_PER_POINT,
         }
-    
-    # Очищаем сессию
+
     if 'tour_complete' in request.session:
         del request.session['tour_complete']
     
@@ -312,7 +299,6 @@ def scan_qr(request):
 
 @login_required
 def process_qr_code(request):
-    """Обработка отсканированного QR-кода"""
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
@@ -354,7 +340,6 @@ def process_qr_code(request):
 
 @login_required
 def abandon_tour(request, tour_id):
-    """Покинуть тур (отменить активный тур)"""
     if request.method != 'POST':
         return redirect('active_tour', tour_id=tour_id)
 
@@ -425,23 +410,16 @@ class Register(View):
         
 @login_required
 def user_profile(request):
-    """Страница профиля пользователя с достижениями и историей туров"""
     profile = get_or_create_profile(request.user)
-    
-    # Обработка загрузки аватарки
     if request.method == 'POST' and request.FILES.get('avatar'):
         profile.avatar = request.FILES['avatar']
         profile.save()
         messages.success(request, 'Аватар обновлен!')
         return redirect('user_profile')
-    
-    # Получаем историю туров (завершенные и активные) - УНИКАЛЬНЫЕ туры
     completed_tour_ids = UserTour.objects.filter(
         user=request.user,
         status='completed'
     ).values_list('tour_id', flat=True).distinct()
-    
-    # Получаем детали только для уникальных завершенных туров (берем последнюю запись)
     completed_tours_list = []
     for tour_id in completed_tour_ids:
         last_completed = UserTour.objects.filter(
@@ -459,25 +437,17 @@ def user_profile(request):
             })
     
     completed_tours = len(completed_tours_list)
-    
-    # РАСЧЕТ ПРОЦЕНТА ЗАКРЫТЫХ ТУРОВ (уникальные)
     total_tours = Tour.objects.filter(is_active=True).count()
     completion_percentage = 0
     if total_tours > 0:
         completion_percentage = round((completed_tours / total_tours) * 100)
-    
-    # Активный тур (если есть)
     active_tour = UserTour.objects.filter(
         user=request.user,
         status='active'
     ).select_related('tour').first()
-    
-    # Общее количество посещенных точек (все записи, не уникальные)
     total_points = UserTourPoint.objects.filter(
         user_tour__user=request.user
     ).count()
-    
-    # Достижения
     unlocked_achievements = []
     locked_achievements = []
     
@@ -559,11 +529,8 @@ def user_profile(request):
         'total_tours': total_tours,
     }
     return render(request, 'main/user_profile.html', context)
-# ===== МАГАЗИН =====
-
 @login_required
 def shop(request):
-    """Страница магазина"""
     profile = get_or_create_profile(request.user)
     items = ShopItem.objects.filter(is_active=True)
     
@@ -579,7 +546,6 @@ def shop(request):
 
 @login_required
 def buy_item(request, item_id):
-    """Покупка товара"""
     item = get_object_or_404(ShopItem, id=item_id, is_active=True)
     profile = get_or_create_profile(request.user)
     
@@ -601,7 +567,6 @@ def buy_item(request, item_id):
 
 @login_required
 def purchase_detail(request, purchase_id):
-    """Страница с деталями покупки и промокодом"""
     purchase = get_object_or_404(UserPurchase, id=purchase_id, user=request.user)
     
     if not purchase.promo_code_displayed:

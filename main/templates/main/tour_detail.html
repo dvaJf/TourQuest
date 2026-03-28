@@ -4,17 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{{ tour.title }} - TourQuest</title>
-
 <script src="https://api-maps.yandex.ru/2.1/?apikey=91684f5c-70b0-4bdf-8195-5eaeffdca557&lang=ru_RU" type="text/javascript"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f2ecd8;
+    --bg: #f0e9d6;
     --card-bg: #e8dfc8;
     --brown: #8b6b47;
     --dark: #2c2016;
-    --red: #c08000;
     --green: #4a7c59;
     --btn-bg: #c49a6c;
     --btn-dark: #b5885a;
@@ -32,7 +29,6 @@
     padding-bottom: 40px;
   }
 
-  /* Шапка */
   .header {
     display: flex;
     align-items: center;
@@ -62,17 +58,14 @@
   }
 
   .logo {
-    font-family: 'Courier Prime', monospace;
+    font-family: 'Special Elite', serif;
     font-size: 20px;
-    font-weight: 700;
   }
 
-  /* Контент */
   .container {
     padding: 0 20px;
   }
 
-  /* КАРТА вместо заглушки */
   #map {
     width: 100%;
     height: 280px;
@@ -82,13 +75,13 @@
     overflow: hidden;
   }
 
-  /* Заголовок и мета */
   .tour-header {
     margin-bottom: 20px;
   }
 
   .tour-title {
-    font-size: 24px;
+    font-family: 'Special Elite', serif;
+    font-size: 22px;
     font-weight: 700;
     margin-bottom: 12px;
     line-height: 1.3;
@@ -113,7 +106,6 @@
   .meta-tag.difficulty-medium { border-color: #c08000; color: #c08000; }
   .meta-tag.difficulty-hard { border-color: #c08000; color: #c08000; }
 
-  /* Стили для цены в мета-тегах */
   .meta-tag.price-free {
     border-color: #28a745;
     color: #28a745;
@@ -135,7 +127,6 @@
     font-weight: 700;
   }
 
-  /* Баннер активного тура */
   .active-tour-banner {
     background: var(--green);
     color: white;
@@ -173,7 +164,6 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   }
 
-  /* Описание */
   .description-section {
     background: var(--card-bg);
     border-radius: 16px;
@@ -195,14 +185,13 @@
     color: var(--dark);
   }
 
-  /* Точки маршрута */
   .points-section {
     margin-bottom: 24px;
   }
 
   .points-title {
+    font-family: 'Special Elite', serif;
     font-size: 18px;
-    font-weight: 700;
     margin-bottom: 16px;
   }
 
@@ -240,12 +229,6 @@
     margin-bottom: 2px;
   }
 
-  .point-desc {
-    font-size: 12px;
-    color: var(--brown);
-  }
-
-  /* Кнопки */
   .action-section {
     position: sticky;
     bottom: 20px;
@@ -274,7 +257,6 @@
   .start-btn:hover {
     background: var(--btn-dark);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
   }
 
   .scan-btn {
@@ -298,41 +280,8 @@
   .scan-btn:hover {
     background: #3d6b4c;
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
   }
 
-  .scan-btn::before {
-    content: "📷 ";
-  }
-
-  /* Сообщения */
-  .messages {
-    margin-bottom: 20px;
-  }
-
-  .message {
-    padding: 12px 16px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    font-size: 14px;
-  }
-
-  .message.success {
-    background: var(--green);
-    color: white;
-  }
-
-  .message.warning {
-    background: #c08000;
-    color: white;
-  }
-
-  .message.error {
-    background: var(#c08000);
-    color: white;
-  }
-
-  /* Горы внизу */
   .mountains {
     position: fixed;
     bottom: 0;
@@ -358,17 +307,15 @@
 
 <div class="container">
 
-  <!-- Баннер активного тура -->
   {% if active_user_tour %}
   <div class="active-tour-banner">
-    <h3> Тур активен!</h3>
+    <h3>Тур активен</h3>
     <p>Текущая точка: {{ active_user_tour.get_current_point.name|default:"Начните с первой точки" }}</p>
     <a href="{% url 'active_tour' tour.id %}" class="active-tour-btn">Продолжить тур →</a>
   </div>
   {% endif %}
 
-  <!-- КАРТА ЯНДЕКС -->
-
+  <div id="map"></div>
 
   <div class="tour-header">
     <h1 class="tour-title">"{{ tour.title }}"</h1>
@@ -383,7 +330,6 @@
       <span class="meta-tag">{{ tour.duration }}</span>
       <span class="meta-tag">★ {{ tour.rating }}/5</span>
       
-      <!-- ЦЕНА С ЦВЕТОВОЙ ИНДИКАЦИЕЙ -->
       {% if tour.price == 0 %}
         <span class="meta-tag price-free">Бесплатно</span>
       {% elif tour.price > 0 and tour.price <= 1000 %}
@@ -419,16 +365,13 @@
 
 <div class="action-section">
   {% if active_user_tour %}
-    <!-- Если тур активен - показываем кнопку сканирования QR -->
     <a href="{% url 'scan_qr' %}" class="scan-btn">Сканировать QR-код</a>
   {% else %}
-    <!-- Если тур не активен - кнопка начала тура -->
     <a href="{% url 'start_tour' tour.id %}" class="start-btn">Начать тур →</a>
   {% endif %}
 </div>
 
 <script>
-// Данные точек из Django
 const pointsData = [
     {% for point in points %}
     {
@@ -446,14 +389,12 @@ ymaps.ready(init);
 function init() {
     if (pointsData.length === 0) return;
 
-    // Центр карты — первая точка
     map = new ymaps.Map('map', {
         center: pointsData[0].coords,
         zoom: 15,
         controls: []
     });
 
-    // Добавляем точки с номерами (большие кружки)
     pointsData.forEach((point, index) => {
         const layout = ymaps.templateLayoutFactory.createClass(
             `<div style="
@@ -486,7 +427,6 @@ function init() {
         map.geoObjects.add(placemark);
     });
 
-    // Строим маршрут между точками (только линия, без точек маршрута)
     const allCoords = pointsData.map(p => p.coords);
     if (allCoords.length > 1) {
         ymaps.route(allCoords, {
@@ -504,4 +444,28 @@ function init() {
                 hintVisible: false
             });
             
-            // Принудительно
+            const wayPoints = route.getWayPoints();
+            if (wayPoints) {
+                wayPoints.each(function(point) {
+                    point.options.set('visible', false);
+                });
+            }
+
+            map.geoObjects.add(route);
+            map.setBounds(route.getBounds(), { checkZoomRange: true, zoomMargin: 20 });
+        }).catch(function() {
+            for (let i = 0; i < allCoords.length - 1; i++) {
+                const polyline = new ymaps.Polyline([allCoords[i], allCoords[i+1]], {}, {
+                    strokeColor: '#2ecc71',
+                    strokeWidth: 4,
+                    strokeOpacity: 0.8
+                });
+                map.geoObjects.add(polyline);
+            }
+        });
+    }
+}
+</script>
+
+</body>
+</html>

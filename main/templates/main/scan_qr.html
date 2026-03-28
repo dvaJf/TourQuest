@@ -188,7 +188,6 @@ const video = document.getElementById('preview');
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
 
-// Запуск камеры
 async function startCamera() {
     try {
         stream = await navigator.mediaDevices.getUserMedia({
@@ -207,7 +206,6 @@ async function startCamera() {
     }
 }
 
-// Сканирование
 function scan() {
     if (!scanning) return;
 
@@ -227,8 +225,6 @@ function scan() {
 
     if (code) {
         scanning = false;
-
-        // Отправляем QR-код на сервер для обработки
         fetch('/process-qr/', {
             method: 'POST',
             headers: {
@@ -260,7 +256,6 @@ function scan() {
     requestAnimationFrame(scan);
 }
 
-// Получение CSRF токена
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -283,7 +278,6 @@ function showError(message) {
     document.body.appendChild(errorDiv);
 }
 
-// Запускаем камеру при загрузке
 startCamera();
 </script>
 

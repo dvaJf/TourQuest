@@ -10,11 +10,7 @@ urlpatterns = [
     path('logout/', views.user_logout, name="logout"),
     path('make/', views.maket, name="maket"),
     path('main/', views.index, name="main"),
-    
-    # Страница профиля пользователя
     path('profile/', views.user_profile, name='user_profile'),
-
-    # URL для деталей тура
     path('tour/<int:tour_id>/', views.tour_detail, name='tour_detail'),
     path('tour/<int:tour_id>/start/', views.start_tour, name='start_tour'),
     path('tour/<int:tour_id>/active/', views.active_tour, name='active_tour'),
@@ -24,9 +20,8 @@ urlpatterns = [
     path('scan-qr/', views.scan_qr, name='scan_qr'),
     path('process-qr/', views.process_qr_code, name='process_qr_code'),
     path('about/', TemplateView.as_view(template_name='main/about.html'), name='about'),
-    # Добавьте в urlpatterns в urls(1).py
-path('shop/', views.shop, name='shop'),
-path('shop/buy/<int:item_id>/', views.buy_item, name='buy_item'),
-path('purchase/<int:purchase_id>/', views.purchase_detail, name='purchase_detail'),
-path('tour/complete/', views.tour_complete, name='tour_complete'),
+    path('shop/', views.shop, name='shop'),
+    path('shop/buy/<int:item_id>/', views.buy_item, name='buy_item'),
+    path('purchase/<int:purchase_id>/', views.purchase_detail, name='purchase_detail'),
+    path('tour/complete/', views.tour_complete, name='tour_complete'),
 ]

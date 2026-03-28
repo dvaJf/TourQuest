@@ -103,7 +103,7 @@
   }
 
   .profile-name {
-    font-family: 'Special Elite', serif;
+    font-family: 'Courier Prime', serif;
     font-size: 22px;
   }
 
@@ -114,7 +114,7 @@
   }
 
   .section-title {
-    font-family: 'Special Elite', serif;
+    font-family: 'Courier Prime', serif;
     font-size: 20px;
     padding: 4px 20px 10px;
   }
@@ -359,8 +359,6 @@
       </div>
     </a>
   </header>
-
-<!-- Профиль пользователя -->
 <a href="{% url 'user_profile' %}" style="text-decoration: none; color: inherit;">
   <div class="profile">
     <div class="avatar" style="border: 3px solid var(--brown); padding: 0; overflow: hidden;">
@@ -383,7 +381,6 @@
   </div>
 </a>
 
-<!-- КНОПКА МАГАЗИНА -->
 {% if user.is_authenticated %}
 <a href="{% url 'shop' %}" style="text-decoration: none; color: inherit; display: block; margin: 0 14px 20px;">
   <div style="
@@ -420,7 +417,6 @@
 </a>
 {% endif %}
 
-<!-- ДОСТУПНЫЕ ТУРЫ -->
 <div class="section-title">Доступные туры</div>
 
 {% if available_tours %}
@@ -458,7 +454,6 @@
           <span class="tag">{{ tour.distance }} км</span>
           <span class="tag">{{ tour.duration }}</span>
           <span class="tag">★ {{ tour.rating }}/5</span>
-          <!-- ЦЕНА С ЦВЕТОВОЙ ИНДИКАЦИЕЙ -->
           {% if tour.price == 0 %}
             <span class="price-tag price-free">Бесплатно</span>
           {% elif tour.price > 0 and tour.price <= 1000 %}
@@ -475,11 +470,9 @@
   <p class="no-tours">Нет доступных туров</p>
 {% endif %}
 
-<!-- РАЗДЕЛИТЕЛЬ -->
 {% if completed_tours %}
 <div class="divider"></div>
 
-<!-- ПРОЙДЕННЫЕ ТУРЫ (внизу) -->
 <div class="section-title">Пройденные туры</div>
 
 {% for item in completed_tours %}
@@ -513,7 +506,6 @@
         <span class="tag">{{ item.tour.distance }} км</span>
         <span class="tag">{{ item.tour.duration }}</span>
         <span class="tag">★{{ item.tour.rating }}/5</span>
-        <!-- ЦЕНА ДЛЯ ПРОЙДЕННЫХ ТУРОВ -->
         {% if item.tour.price == 0 %}
           <span class="price-tag price-free">Бесплатно</span>
         {% elif item.tour.price > 0 and item.tour.price <= 1000 %}

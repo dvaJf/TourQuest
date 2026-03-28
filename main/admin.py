@@ -17,15 +17,14 @@ class TourAdmin(admin.ModelAdmin):
     inlines = [TourPointInline]
     
     def display_price(self, obj):
-        """Отображение цены с цветовой индикацией"""
         if obj.price == 0:
-            color = '#28a745'  # зеленый
+            color = '#28a745'
             text = 'Бесплатно'
         elif obj.price <= 1000:
-            color = '#ffc107'  # желтый
+            color = '#ffc107'
             text = f'{obj.price} ₽'
         else:
-            color = '#dc3545'  # красный
+            color = '#dc3545'
             text = f'{obj.price} ₽'
         
         return format_html(

@@ -83,15 +83,12 @@ class UserTour(models.Model):
         return f"{self.user.username} - {self.tour.title} ({self.status})"
 
     def get_current_point(self):
-        """Получить текущую активную точку"""
         return self.tour.points.filter(order=self.current_point_order).first()
 
     def get_next_point(self):
-        """Получить следующую точку"""
         return self.tour.points.filter(order=self.current_point_order + 1).first()
 
     def complete_current_point(self):
-        """Отметить текущую точку как пройденную и перейти к следующей"""
         from django.utils import timezone
         current_point = self.get_current_point()
         if current_point:
@@ -125,12 +122,11 @@ class UserTourPoint(models.Model):
 
     def __str__(self):
         return f"{self.user_tour.user.username} - {self.point.name}"
-    
-# Модель профиля пользователя для хранения баланса
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     balance = models.IntegerField(default=0, verbose_name='Баланс')
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name='Аватар')  # ← ДОБАВИТЬ
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name='Аватар')
     
     class Meta:
         verbose_name = 'Профиль пользователя'
@@ -144,20 +140,16 @@ class UserProfile(models.Model):
         return f"{self.user.username} - {self.balance} монет"
     
     def add_balance(self, amount):
-        """Начислить монеты"""
         self.balance += amount
         self.save()
     
     def subtract_balance(self, amount):
-        """Списать монеты"""
         if self.balance >= amount:
             self.balance -= amount
             self.save()
             return True
         return False
 
-
-# Модель товара в магазине
 class ShopItem(models.Model):
     name = models.CharField(max_length=200, verbose_name='Название товара')
     description = models.TextField(verbose_name='Описание')
@@ -176,8 +168,6 @@ class ShopItem(models.Model):
     def __str__(self):
         return f"{self.name} - {self.price} монет"
 
-
-# Модель покупки пользователя
 class UserPurchase(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='purchases')
     item = models.ForeignKey(ShopItem, on_delete=models.CASCADE)

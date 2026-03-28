@@ -543,7 +543,6 @@
   let userPlacemark;
   let userRouteToPoint;
 
-  // Находим активную точку
   function getActivePoint() {
       return pointsData.find(p => p.isCurrent) || pointsData[0];
   }
@@ -554,15 +553,11 @@
       if (pointsData.length === 0) return;
 
       const activePoint = getActivePoint();
-
-      // Центр карты — активная точка
       map = new ymaps.Map('map', {
           center: activePoint.coords,
           zoom: 15,
           controls: []
       });
-
-      // Добавляем точки с номерами (большие кружки)
       pointsData.forEach((p, index) => {
           let color = '#8b6b47';
           let iconContent = (index + 1).toString();
@@ -607,7 +602,6 @@
           map.geoObjects.add(placemark);
       });
 
-      // Строим маршрут между точками (только линия, без точек маршрута)
       const allCoords = pointsData.map(p => p.coords);
       if (allCoords.length > 1) {
           ymaps.route(allCoords, {
@@ -624,8 +618,6 @@
                   balloonVisible: false,
                   hintVisible: false
               });
-
-              // Принудительно скрываем waypoints
               const wayPoints = route.getWayPoints();
               if (wayPoints) {
                   wayPoints.each(function(point) {
@@ -636,7 +628,6 @@
               map.geoObjects.add(route);
               map.setBounds(route.getBounds(), { checkZoomRange: true, zoomMargin: 20 });
           }).catch(function() {
-              // Запасной вариант — прямые линии
               for (let i = 0; i < allCoords.length - 1; i++) {
                   const polyline = new ymaps.Polyline([allCoords[i], allCoords[i+1]], {}, {
                       strokeColor: '#2ecc71',
@@ -648,7 +639,6 @@
           });
       }
 
-      // Добавляем геолокацию и маршрут до активной точки
       addUserLocationAndRoute();
   }
 
@@ -658,7 +648,6 @@
           return;
       }
 
-      // Кнопка геолокации
       const geoButton = new ymaps.control.Button({
           data: {
               content: '📍',
@@ -679,8 +668,6 @@
       });
 
       map.controls.add(geoButton, { float: 'right' });
-
-      // Автоматическое определение позиции при загрузке
       navigator.geolocation.getCurrentPosition(
           updateUserPosition,
           (error) => console.log('Геолокация недоступна:', error),
@@ -692,7 +679,6 @@
       const userCoords = [position.coords.latitude, position.coords.longitude];
       const activePoint = getActivePoint();
 
-      // Удаляем старую метку и маршрут
       if (userPlacemark) {
           map.geoObjects.remove(userPlacemark);
       }
@@ -700,7 +686,6 @@
           map.geoObjects.remove(userRouteToPoint);
       }
 
-      // Метка пользователя
       const userLayout = ymaps.templateLayoutFactory.createClass(
           `<div style="
               width: 20px;
@@ -725,24 +710,21 @@
       });
 
       map.geoObjects.add(userPlacemark);
-
-      // Маршрут от пользователя до активной точки — ТАК ЖЕ КАК МЕЖДУ ТОЧКАМИ ТУРА
       ymaps.route([userCoords, activePoint.coords], {
           routingMode: 'pedestrian',
-          multiRoute: true  // КАК В МАРШРУТЕ ТУРА
+          multiRoute: true 
       }).then(function(route) {
           route.options.set({
               strokeColor: '#3498db',
               strokeWidth: 5,
               opacity: 0.8,
-              wayPointVisible: false,      // скрыть точки
+              wayPointVisible: false,  
               viaPointVisible: false,
               routeMarkerVisible: false,
               balloonVisible: false,
               hintVisible: false
           });
 
-          // Принудительно скрываем waypoints — КАК В МАРШРУТЕ ТУРА
           const wayPoints = route.getWayPoints();
           if (wayPoints) {
               wayPoints.each(function(point) {
@@ -753,7 +735,6 @@
           userRouteToPoint = route;
           map.geoObjects.add(route);
       }).catch(function() {
-          // Запасной вариант — прямая линия
           userRouteToPoint = new ymaps.Polyline([userCoords, activePoint.coords], {}, {
               strokeColor: '#3498db',
               strokeWidth: 4,
