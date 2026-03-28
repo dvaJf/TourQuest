@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Профиль - {{ user.username }} - TourQuest</title>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0e9d6;
+    --card-bg: #e8dfc8;
+    --brown: #8b6b47;
+    --dark: #2c2016;
+    --red: #c0392b;
+    --green: #4a7c59;
+    --gold: #d4af37;
+    --silver: #c0c0c0;
+    --bronze: #cd7f32;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Courier Prime', monospace;
+    background: var(--bg);
+    color: var(--dark);
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 160px;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px;
+    gap: 16px;
+  }
+
+  .back-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--brown);
+    border-radius: 50%;
+    background: none;
+    color: var(--brown);
+    font-size: 18px;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .back-btn:hover { background: var(--brown); color: white; }
+
+  .logo {
+    font-family: 'Courier Prime', monospace;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .container { padding: 0 20px; }
+
+  /* Карточка профиля */
+  .profile-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 30px 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .profile-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(135deg, var(--brown) 0%, #6b4b37 100%);
+  }
+
+  .avatar-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 4px solid var(--bg);
+    margin: 0 auto 15px;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+  }
+
+  .username {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+
+  .user-level {
+    display: inline-block;
+    background: var(--gold);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  /* Статистика */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .stat-box {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 20px 10px;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--brown);
+    margin-bottom: 5px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--dark);
+    opacity: 0.8;
+  }
+
+  /* Активный тур */
+  .active-tour-section {
+    background: linear-gradient(135deg, var(--green) 0%, #3d6b4c 100%);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    color: white;
+  }
+
+  .active-tour-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+    margin-bottom: 8px;
+  }
+
+  .active-tour-name {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 15px;
+  }
+
+  .continue-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: white;
+    color: var(--green);
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 700;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .continue-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+
+  .no-active-tour {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 30px 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--brown);
+  }
+
+  /* История туров */
+  .history-section {
+    margin-bottom: 20px;
+  }
+
+  .history-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    padding: 0 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .history-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+  }
+
+  .history-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .history-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--green);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .history-info {
+    flex: 1;
+  }
+
+  .history-tour-name {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .history-date {
+    font-size: 12px;
+    color: var(--brown);
+  }
+
+  .history-stats {
+    font-size: 12px;
+    color: var(--green);
+    margin-top: 4px;
+  }
+
+  /* Достижения */
+  .achievements-section {
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    padding: 0 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-subtitle {
+    font-size: 14px;
+    color: var(--brown);
+    margin-bottom: 10px;
+    padding: 0 5px;
+  }
+
+  .achievement-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 10px;
+    transition: all 0.2s;
+  }
+
+  .achievement-card.unlocked {
+    background: linear-gradient(135deg, #fff9e6 0%, var(--card-bg) 100%);
+    border: 2px solid var(--gold);
+  }
+
+  .achievement-card.locked {
+    opacity: 0.5;
+    background: #e0e0e0;
+  }
+
+  .achievement-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .achievement-card.unlocked .achievement-icon {
+    background: var(--gold);
+  }
+
+  .achievement-card.locked .achievement-icon {
+    background: #999;
+  }
+
+  .achievement-info {
+    flex: 1;
+  }
+
+  .achievement-title {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .achievement-card.locked .achievement-title {
+    color: #666;
+  }
+
+  .achievement-desc {
+    font-size: 12px;
+    color: var(--brown);
+  }
+
+  .achievement-card.locked .achievement-desc {
+    color: #888;
+  }
+
+  /* Горы */
+  .mountains {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 120px;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .mountains svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* Кнопка выхода */
+  .logout-btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: transparent;
+    border: 2px solid var(--red);
+    border-radius: 50px;
+    color: var(--red);
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 20px;
+  }
+
+  .logout-btn:hover {
+    background: var(--red);
+    color: white;
+  }
+
+  .empty-achievements {
+    text-align: center;
+    padding: 30px;
+    color: var(--brown);
+    font-style: italic;
+  }
+
+  .empty-history {
+    text-align: center;
+    padding: 30px;
+    color: var(--brown);
+    font-style: italic;
+    background: var(--card-bg);
+    border-radius: 16px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="{% url 'main' %}" class="back-btn">←</a>
+  <div class="logo">Профиль</div>
+</div>
+
+<div class="container">
+
+  <!-- Карточка профиля -->
+ <!-- Карточка профиля -->
+ <div class="profile-card" style="border: 4px solid var(--brown);">
+    <form method="post" enctype="multipart/form-data" style="position: relative; z-index: 1;">
+      {% csrf_token %}
+      <div class="avatar-large" style="position: relative; cursor: pointer; border: 4px solid var(--brown); padding: 0; overflow: hidden;" onclick="document.getElementById('avatar-input').click()">
+        {% if profile.avatar %}
+          <img src="{{ profile.avatar.url }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+        {% else %}
+          <svg viewBox="0 0 48 48">
+            <circle cx="24" cy="18" r="10" fill="#c8a07a"/>
+            <ellipse cx="24" cy="42" rx="16" ry="10" fill="#c8a07a"/>
+          </svg>
+        {% endif %}
+        <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(139,107,71,0.8); color: white; font-size: 10px; padding: 4px; text-align: center;">Изменить</div>
+      </div>
+      <input type="file" name="avatar" id="avatar-input" accept="image/*" style="display: none;" onchange="this.form.submit()">
+    </form>
+    <div class="username">{{ user.username }}</div>
+    <span class="user-level">Уровень {{ completed_tours|add:1|default:1 }}</span>
+  </div>
+
+  <!-- Статистика -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-number">{{ completed_tours }}</div>
+      <div class="stat-label">Туров пройдено</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">{{ total_points }}</div>
+      <div class="stat-label">Точек посещено</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">{{ unlocked_achievements|length }}</div>
+      <div class="stat-label">Достижений</div>
+    </div>
+  </div>
+  <!-- Прогресс прохождения -->
+  <div style="background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 2px solid var(--brown);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <span style="font-size: 14px; font-weight: 700; color: var(--brown);">Пройдено туров</span>
+      <span style="font-size: 18px; font-weight: 700; color: var(--green);">{{ completion_percentage }}%</span>
+    </div>
+    <div style="width: 100%; height: 12px; background: #d4c9a8; border-radius: 10px; overflow: hidden;">
+      <div style="height: 100%; width: {{ completion_percentage }}%; background: linear-gradient(90deg, var(--green), #5a9c69); border-radius: 10px; transition: width 0.5s ease;"></div>
+    </div>
+    <div style="text-align: center; margin-top: 8px; font-size: 12px; color: var(--brown);">
+      {{ completed_tours }} из {{ total_tours }} туров
+    </div>
+  </div>
+  <!-- Активный тур -->
+  {% if active_tour %}
+  <div class="active-tour-section">
+    <div class="active-tour-label">Активный тур</div>
+    <div class="active-tour-name">{{ active_tour.tour.title }}</div>
+    <a href="{% url 'active_tour' active_tour.tour.id %}" class="continue-btn">
+      Продолжить тур →
+    </a>
+  </div>
+  {% else %}
+  <div class="no-active-tour">
+    <p>Нет активного тура</p>
+    <p style="font-size: 12px; margin-top: 10px;">Выберите тур на главной странице</p>
+  </div>
+  {% endif %}
+
+  <!-- ИСТОРИЯ ТУРОВ -->
+  <div class="history-section">
+    <h2 class="history-title"> История туров</h2>
+    
+    {% if completed_tours_list %}
+      {% for tour_item in completed_tours_list %}
+      <div class="history-card">
+        <div class="history-icon">✓</div>
+        <div class="history-info">
+          <div class="history-tour-name">{{ tour_item.tour.title }}</div>
+          <div class="history-date">{{ tour_item.completed_at|date:"d.m.Y H:i" }}</div>
+          <div class="history-stats">
+            {{ tour_item.completed_points }}/{{ tour_item.points_count }} точек • {{ tour_item.tour.distance }} км
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-history">
+        <p>Вы еще не прошли ни одного тура</p>
+        <p style="font-size: 12px; margin-top: 10px;">Начните свое первое приключение!</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- РАЗБЛОКИРОВАННЫЕ ДОСТИЖЕНИЯ -->
+  {% if unlocked_achievements %}
+  <div class="achievements-section">
+    <h2 class="section-title"> Полученные</h2>
+    
+    {% for achievement in unlocked_achievements %}
+    <div class="achievement-card unlocked">
+      <div class="achievement-icon">{{ achievement.icon }}</div>
+      <div class="achievement-info">
+        <div class="achievement-title">{{ achievement.title }}</div>
+        <div class="achievement-desc">{{ achievement.description }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ЗАБЛОКИРОВАННЫЕ ДОСТИЖЕНИЯ -->
+  {% if locked_achievements %}
+  <div class="achievements-section">
+    <h2 class="section-title"> В процессе</h2>
+    <p class="section-subtitle">Выполните условия, чтобы разблокировать</p>
+    
+    {% for achievement in locked_achievements %}
+    <div class="achievement-card locked">
+      <div class="achievement-icon"></div>
+      <div class="achievement-info">
+        <div class="achievement-title">{{ achievement.title }}</div>
+        <div class="achievement-desc">{{ achievement.description }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Кнопка выхода -->
+  <a href="{% url 'logout' %}" class="logout-btn">Выйти из аккаунта</a>
+
+</div>
+
+
+</body>
+</html>

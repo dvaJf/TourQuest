@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>{{ item.name }} - Покупка - TourQuest</title>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0e9d6;
+    --card-bg: #e8dfc8;
+    --brown: #8b6b47;
+    --dark: #2c2016;
+    --red: #c0392b;
+    --green: #4a7c59;
+    --gold: #d4af37;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--bg);
+    font-family: 'Courier Prime', monospace;
+    color: var(--dark);
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    padding-bottom: 160px;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px 12px;
+    gap: 16px;
+  }
+
+  .back-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--brown);
+    border-radius: 50%;
+    background: none;
+    color: var(--brown);
+    font-size: 18px;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .back-btn:hover {
+    background: var(--brown);
+    color: white;
+  }
+
+  .logo {
+    font-family: 'Special Elite', serif;
+    font-size: 22px;
+    color: var(--dark);
+    letter-spacing: 0.5px;
+  }
+
+  .container {
+    padding: 0 20px;
+  }
+
+  .success-banner {
+    background: linear-gradient(135deg, var(--green) 0%, #3d6b4c 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 24px 20px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .success-icon {
+    font-size: 60px;
+    margin-bottom: 12px;
+  }
+
+  .success-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .success-date {
+    font-size: 13px;
+    opacity: 0.9;
+  }
+
+  .item-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .item-image {
+    width: 120px;
+    height: 120px;
+    background: #f5efd8;
+    border-radius: 16px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    border: 2px solid var(--brown);
+  }
+
+  .item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 16px;
+  }
+
+  .item-name {
+    font-family: 'Special Elite', serif;
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .item-desc {
+    font-size: 14px;
+    color: var(--brown);
+    line-height: 1.5;
+  }
+
+  .promo-section {
+    background: linear-gradient(135deg, var(--gold) 0%, #b8960c 100%);
+    border-radius: 16px;
+    padding: 24px 20px;
+    margin-bottom: 20px;
+    color: white;
+    text-align: center;
+  }
+
+  .promo-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    opacity: 0.9;
+  }
+
+  .promo-code {
+    background: rgba(255,255,255,0.2);
+    border: 2px dashed white;
+    border-radius: 12px;
+    padding: 20px;
+    font-size: 18px;
+    font-weight: 700;
+    word-break: break-all;
+    margin-bottom: 12px;
+    font-family: 'Courier Prime', monospace;
+  }
+
+  .promo-hint {
+    font-size: 13px;
+    opacity: 0.9;
+  }
+
+  .action-btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: var(--brown);
+    border: 2px solid var(--dark);
+    border-radius: 50px;
+    color: white;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 12px;
+  }
+
+  .action-btn:hover {
+    background: var(--dark);
+    transform: translateY(-2px);
+  }
+
+  .secondary-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 2px solid var(--brown);
+    border-radius: 50px;
+    color: var(--brown);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .secondary-btn:hover {
+    background: var(--brown);
+    color: white;
+  }
+
+  .mountains {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .mountains svg {
+    width: 100%;
+    height: 100%;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="{% url 'shop' %}" class="back-btn">←</a>
+  <div class="logo">Ваша покупка</div>
+</header>
+
+<div class="container">
+
+  <div class="success-banner">
+    <div class="success-icon"></div>
+    <div class="success-title">Покупка совершена!</div>
+    <div class="success-date">{{ purchase.purchased_at|date:"d.m.Y H:i" }}</div>
+  </div>
+
+  <div class="item-card">
+    <div class="item-image">
+      {% if item.image %}
+        <img src="{{ item.image.url }}" alt="{{ item.name }}">
+      {% else %}
+        🎁
+      {% endif %}
+    </div>
+    <div class="item-name">{{ item.name }}</div>
+    <div class="item-desc">{{ item.description }}</div>
+  </div>
+
+  <div class="promo-section">
+    <div class="promo-label">Ваш промокод </div>
+    <div class="promo-code">{{ item.promo_code }}</div>
+    <div class="promo-hint">Сохраните этот код! Он больше не будет показан.</div>
+  </div>
+
+  <a href="{% url 'shop' %}" class="action-btn">← Вернуться в магазин</a>
+  <a href="{% url 'main' %}" class="secondary-btn">На главную</a>
+
+</div>
+
+
+
+</body>
+</html>

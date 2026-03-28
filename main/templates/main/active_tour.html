@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Активный тур - {{ tour.title }} - TourQuest</title>
+
+<script src="https://api-maps.yandex.ru/2.1/?apikey=91684f5c-70b0-4bdf-8195-5eaeffdca557&lang=ru_RU" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
+<style>
+  :root {
+    --bg: #f2ecd8;
+    --card-bg: #e8dfc8;
+    --brown: #8b6b47;
+    --dark: #2c2016;
+    --red: ##c08000;
+    --green: #4a7c59;
+    --btn-bg: #c49a6c;
+    --btn-dark: #b5885a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Courier Prime', monospace;
+    background: var(--bg);
+    color: var(--dark);
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px;
+    gap: 16px;
+  }
+
+  .back-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--brown);
+    border-radius: 50%;
+    background: none;
+    color: var(--brown);
+    font-size: 18px;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .back-btn:hover {
+    background: var(--brown);
+    color: white;
+  }
+
+  .logo {
+    font-family: 'Courier Prime', monospace;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .container {
+    padding: 0 20px;
+  }
+
+  .progress-section {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .progress-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--brown);
+  }
+
+  .progress-count {
+    font-size: 14px;
+    color: var(--dark);
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 12px;
+    background: #d4c9a8;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), #5a9c69);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+  }
+
+  .current-point-section {
+    background: rgb(249, 185, 66);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    color: white;
+  }
+
+  .current-point-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+    margin-bottom: 8px;
+  }
+
+  .current-point-name {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .current-point-hint {
+    font-size: 13px;
+    opacity: 0.9;
+  }
+
+  .tour-completed {
+    background: linear-gradient(135deg, var(--green) 0%, #3d6b4c 100%);
+    border-radius: 16px;
+    padding: 30px 20px;
+    margin-bottom: 20px;
+    color: white;
+    text-align: center;
+  }
+
+  .tour-completed h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .tour-completed p {
+    font-size: 14px;
+    opacity: 0.9;
+  }
+
+  #map {
+    width: 100%;
+    height: 300px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    border: 2px solid var(--card-bg);
+    overflow: hidden;
+  }
+
+  .points-list {
+    margin-bottom: 20px;
+  }
+
+  .points-list-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding: 0 4px;
+  }
+
+  .point-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    transition: all 0.2s;
+  }
+
+  .point-item.completed {
+    opacity: 0.7;
+  }
+
+  .point-item.current {
+    border: 2px solid rgb(240, 156, 0);
+    background: #fff5f5;
+  }
+
+  .point-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .point-item.completed .point-number {
+    background: var(--green);
+    color: white;
+  }
+
+  .point-item.current .point-number {
+    background:rgb(240, 156, 0);
+    color: white;
+    animation: pulse 2s infinite;
+  }
+
+  .point-item.pending .point-number {
+    background: #d4c9a8;
+    color: var(--brown);
+  }
+
+  .point-info {
+    flex: 1;
+  }
+
+  .point-name {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+
+  .point-status {
+    font-size: 12px;
+    color: var(--brown);
+  }
+
+  .point-item.completed .point-status {
+    color: var(--green);
+  }
+
+  .point-item.current .point-status {
+    color: rgb(240, 156, 0);
+  }
+
+  .action-section {
+    position: sticky;
+    bottom: 20px;
+    padding: 0 20px;
+  }
+
+  .scan-btn {
+    display: block;
+    width: 100%;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--green) 0%, #3d6b4c 100%);
+    border: none;
+    border-radius: 50px;
+    color: white;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 6px 20px rgba(74, 124, 89, 0.4);
+    margin-bottom: 12px;
+  }
+
+  .scan-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(74, 124, 89, 0.5);
+  }
+
+  .abandon-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 2px solid var(--red);
+    border-radius: 50px;
+    color: white;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #c08000;
+  }
+
+  .abandon-btn:hover {
+    background: var(--red);
+    color: white;
+  }
+
+  #scannerModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: black;
+    z-index: 9999;
+  }
+
+  .scanner-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+  }
+
+  .scanner-title {
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  #closeScannerBtn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--red);
+    color: white;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .scanner-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 250px;
+    height: 250px;
+    border: 3px solid var(--green);
+    border-radius: 20px;
+    pointer-events: none;
+  }
+
+  .scanner-overlay::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--green);
+    animation: scan-line 2s linear infinite;
+  }
+
+  @keyframes scan-line {
+    0% { top: 10%; }
+    50% { top: 90%; }
+    100% { top: 10%; }
+  }
+
+  .scanner-hint {
+    position: absolute;
+    bottom: 100px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: white;
+    font-size: 14px;
+    padding: 0 20px;
+  }
+
+  .messages {
+    margin-bottom: 20px;
+  }
+
+  .message {
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .message.success {
+    background: var(--green);
+    color: white;
+  }
+
+  .message.error {
+    background: var(--red);
+    color: white;
+  }
+
+  .mountains {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .mountains svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(192, 57, 43, 0); }
+  }
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<div id="scannerModal">
+  <div class="scanner-header">
+    <span class="scanner-title">Сканирование QR-кода</span>
+    <button id="closeScannerBtn">✕</button>
+  </div>
+  <video id="preview" playsinline autoplay></video>
+  <div class="scanner-overlay"></div>
+  <div class="scanner-hint">Наведите камеру на QR-код точки</div>
+</div>
+
+<div class="header">
+  <a href="/main/" class="back-btn">←</a>
+  <div class="logo">Активный тур</div>
+</div>
+
+<div class="container">
+
+  <div class="progress-section">
+      <span class="progress-title">ПРОГРЕСС ТУРА</span>
+      <span class="progress-count">{{ completed_count }} / {{ points_count }}</span>
+  </div>
+
+  {% if user_tour.status == 'completed' %}
+  <div class="tour-completed">
+    <h2> Поздравляем!</h2>
+    <p>Вы успешно завершили тур "{{ tour.title }}"!</p>
+  </div>
+  {% else %}
+  <div class="current-point-section">
+    <div class="current-point-label">Текущая точка</div>
+    {% if current_point %}
+      <div class="current-point-name">{{ current_point.name }}</div>
+      <div class="current-point-hint">Отсканируйте QR-код на этой точке</div>
+    {% else %}
+      <div class="current-point-name">Начните с первой точки</div>
+      <div class="current-point-hint">Отсканируйте QR-код, чтобы начать</div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div id="map"></div>
+
+  <div class="points-list">
+    <h3 class="points-list-title">Точки маршрута</h3>
+    {% for point in points %}
+      {% if point.id in completed_point_ids %}
+        <div class="point-item completed">
+          <div class="point-number">✓</div>
+          <div class="point-info">
+            <div class="point-name">{{ point.name }}</div>
+            <div class="point-status">Пройдено</div>
+          </div>
+        </div>
+      {% elif current_point and point.id == current_point.id %}
+        <div class="point-item current">
+          <div class="point-number">{{ forloop.counter }}</div>
+          <div class="point-info">
+            <div class="point-name">{{ point.name }}</div>
+            <div class="point-status">Текущая точка</div>
+          </div>
+        </div>
+      {% else %}
+        <div class="point-item pending">
+          <div class="point-number">{{ forloop.counter }}</div>
+          <div class="point-info">
+            <div class="point-name">{{ point.name }}</div>
+            <div class="point-status">{% if forloop.counter0 > user_tour.current_point_order %}Будет доступно позже{% else %}Ожидает{% endif %}</div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+</div>
+
+{% if user_tour.status != 'completed' %}
+<div class="action-section">
+  <button class="scan-btn" id="scanQrBtn">Сканировать QR-код</button>
+
+  <form method="post" action="{% url 'abandon_tour' tour.id %}" onsubmit="return confirm('Вы уверены, что хотите покинуть тур? Прогресс будет сохранен, но тур будет отменен.');">
+    {% csrf_token %}
+    <button type="submit" class="abandon-btn">Покинуть тур</button>
+  </form>
+</div>
+{% endif %}
+
+<svg class="mountains" viewBox="0 0 420 120" preserveAspectRatio="none">
+  <polygon points="0,120 60,60 120,120" fill="#c8d4b0" opacity="0.3"/>
+  <polygon points="80,120 160,40 240,120" fill="#c8d4b0" opacity="0.3"/>
+  <polygon points="180,120 270,55 360,120" fill="#c8d4b0" opacity="0.3"/>
+</svg>
+
+{% load l10n %}
+<script>
+  const pointsData = [
+  {% for point in points %}
+  {
+      id: {{ point.id }},
+      coords: [{{ point.latitude|stringformat:".6f" }}, {{ point.longitude|stringformat:".6f" }}],
+          name: '{{ point.name|escapejs }}',
+          order: {{ point.order }},
+          isCompleted: {% if point.id in completed_point_ids %}true{% else %}false{% endif %},
+          isCurrent: {% if current_point and point.id == current_point.id %}true{% else %}false{% endif %}
+      }{% if not forloop.last %},{% endif %}
+      {% endfor %}
+  ];
+
+  let map;
+  let userPlacemark;
+  let userRouteToPoint;
+
+  // Находим активную точку
+  function getActivePoint() {
+      return pointsData.find(p => p.isCurrent) || pointsData[0];
+  }
+
+  ymaps.ready(init);
+
+  function init() {
+      if (pointsData.length === 0) return;
+
+      const activePoint = getActivePoint();
+
+      // Центр карты — активная точка
+      map = new ymaps.Map('map', {
+          center: activePoint.coords,
+          zoom: 15,
+          controls: []
+      });
+
+      // Добавляем точки с номерами (большие кружки)
+      pointsData.forEach((p, index) => {
+          let color = '#8b6b47';
+          let iconContent = (index + 1).toString();
+
+          if (p.isCompleted) {
+              color = '#4a7c59';
+              iconContent = '✓';
+          } else if (p.isCurrent) {
+              color = '#c08000';
+          }
+
+          const layout = ymaps.templateLayoutFactory.createClass(
+              `<div style="
+                  width: 40px;
+                  height: 40px;
+                  background: ${color};
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: white;
+                  font-weight: 700;
+                  font-size: 16px;
+                  font-family: 'Courier Prime', monospace;
+                  border: 3px solid white;
+                  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                  ${p.isCurrent ? 'animation: pulse 2s infinite;' : ''}
+              ">${iconContent}</div>`
+          );
+
+          const placemark = new ymaps.Placemark(p.coords, {
+              hintContent: p.name
+          }, {
+              iconLayout: layout,
+              iconShape: {
+                  type: 'Circle',
+                  coordinates: [20, 20],
+                  radius: 20
+              }
+          });
+
+          map.geoObjects.add(placemark);
+      });
+
+      // Строим маршрут между точками (только линия, без точек маршрута)
+      const allCoords = pointsData.map(p => p.coords);
+      if (allCoords.length > 1) {
+          ymaps.route(allCoords, {
+              routingMode: 'pedestrian',
+              multiRoute: true
+          }).then(function(route) {
+              route.options.set({
+                  strokeColor: '#2ecc71',
+                  strokeWidth: 5,
+                  opacity: 0.8,
+                  wayPointVisible: false,
+                  viaPointVisible: false,
+                  routeMarkerVisible: false,
+                  balloonVisible: false,
+                  hintVisible: false
+              });
+
+              // Принудительно скрываем waypoints
+              const wayPoints = route.getWayPoints();
+              if (wayPoints) {
+                  wayPoints.each(function(point) {
+                      point.options.set('visible', false);
+                  });
+              }
+
+              map.geoObjects.add(route);
+              map.setBounds(route.getBounds(), { checkZoomRange: true, zoomMargin: 20 });
+          }).catch(function() {
+              // Запасной вариант — прямые линии
+              for (let i = 0; i < allCoords.length - 1; i++) {
+                  const polyline = new ymaps.Polyline([allCoords[i], allCoords[i+1]], {}, {
+                      strokeColor: '#2ecc71',
+                      strokeWidth: 4,
+                      strokeOpacity: 0.8
+                  });
+                  map.geoObjects.add(polyline);
+              }
+          });
+      }
+
+      // Добавляем геолокацию и маршрут до активной точки
+      addUserLocationAndRoute();
+  }
+
+  function addUserLocationAndRoute() {
+      if (!navigator.geolocation) {
+          console.log('Геолокация не поддерживается');
+          return;
+      }
+
+      // Кнопка геолокации
+      const geoButton = new ymaps.control.Button({
+          data: {
+              content: '📍',
+              title: 'Моё местоположение'
+          },
+          options: {
+              selectOnClick: false,
+              maxWidth: 40
+          }
+      });
+
+      geoButton.events.add('click', () => {
+          navigator.geolocation.getCurrentPosition(
+              updateUserPosition,
+              (error) => console.error('Ошибка геолокации:', error),
+              { enableHighAccuracy: true }
+          );
+      });
+
+      map.controls.add(geoButton, { float: 'right' });
+
+      // Автоматическое определение позиции при загрузке
+      navigator.geolocation.getCurrentPosition(
+          updateUserPosition,
+          (error) => console.log('Геолокация недоступна:', error),
+          { enableHighAccuracy: true, timeout: 10000 }
+      );
+  }
+
+  function updateUserPosition(position) {
+      const userCoords = [position.coords.latitude, position.coords.longitude];
+      const activePoint = getActivePoint();
+
+      // Удаляем старую метку и маршрут
+      if (userPlacemark) {
+          map.geoObjects.remove(userPlacemark);
+      }
+      if (userRouteToPoint) {
+          map.geoObjects.remove(userRouteToPoint);
+      }
+
+      // Метка пользователя
+      const userLayout = ymaps.templateLayoutFactory.createClass(
+          `<div style="
+              width: 20px;
+              height: 20px;
+              background: #3498db;
+              border: 3px solid white;
+              border-radius: 50%;
+              box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.3);
+              animation: pulse 2s infinite;
+          "></div>`
+      );
+
+      userPlacemark = new ymaps.Placemark(userCoords, {
+          hintContent: 'Вы здесь'
+      }, {
+          iconLayout: userLayout,
+          iconShape: {
+              type: 'Circle',
+              coordinates: [10, 10],
+              radius: 10
+          }
+      });
+
+      map.geoObjects.add(userPlacemark);
+
+      // Маршрут от пользователя до активной точки — ТАК ЖЕ КАК МЕЖДУ ТОЧКАМИ ТУРА
+      ymaps.route([userCoords, activePoint.coords], {
+          routingMode: 'pedestrian',
+          multiRoute: true  // КАК В МАРШРУТЕ ТУРА
+      }).then(function(route) {
+          route.options.set({
+              strokeColor: '#3498db',
+              strokeWidth: 5,
+              opacity: 0.8,
+              wayPointVisible: false,      // скрыть точки
+              viaPointVisible: false,
+              routeMarkerVisible: false,
+              balloonVisible: false,
+              hintVisible: false
+          });
+
+          // Принудительно скрываем waypoints — КАК В МАРШРУТЕ ТУРА
+          const wayPoints = route.getWayPoints();
+          if (wayPoints) {
+              wayPoints.each(function(point) {
+                  point.options.set('visible', false);
+              });
+          }
+
+          userRouteToPoint = route;
+          map.geoObjects.add(route);
+      }).catch(function() {
+          // Запасной вариант — прямая линия
+          userRouteToPoint = new ymaps.Polyline([userCoords, activePoint.coords], {}, {
+              strokeColor: '#3498db',
+              strokeWidth: 4,
+              strokeOpacity: 0.8
+          });
+          map.geoObjects.add(userRouteToPoint);
+      });
+  }
+
+  let stream = null;
+  let scanning = false;
+
+  const modal = document.getElementById('scannerModal');
+  const video = document.getElementById('preview');
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  document.getElementById('scanQrBtn').onclick = async () => {
+      try {
+          modal.style.display = 'block';
+
+          stream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: "environment" }
+          });
+
+          video.srcObject = stream;
+
+          video.onloadedmetadata = () => {
+              video.play();
+              scanning = true;
+              scan();
+          };
+
+      } catch (e) {
+          alert('Нет доступа к камеры: ' + e.message);
+      }
+  };
+
+  document.getElementById('closeScannerBtn').onclick = stopScanner;
+
+  function stopScanner() {
+      scanning = false;
+
+      if (stream) {
+          stream.getTracks().forEach(t => t.stop());
+      }
+
+      modal.style.display = 'none';
+  }
+
+  function scan() {
+      if (!scanning) return;
+
+      if (video.videoWidth === 0) {
+          requestAnimationFrame(scan);
+          return;
+      }
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      ctx.drawImage(video, 0, 0);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+      const code = jsQR(imageData.data, canvas.width, canvas.height);
+
+      if (code) {
+          scanning = false;
+          stopScanner();
+
+          const qrData = code.data;
+
+          fetch('/process-qr/', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': getCookie('csrftoken')
+              },
+              body: JSON.stringify({ qr_data: qrData })
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  window.location.href = data.redirect_url;
+              } else {
+                  alert(data.error || 'QR-код не распознан');
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              alert('Ошибка при обработке QR-кода');
+          });
+
+          return;
+      }
+
+      requestAnimationFrame(scan);
+  }
+
+  function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+
+  const style = document.createElement('style');
+  style.textContent = `
+      @keyframes pulse {
+          0%, 100% { box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.3); }
+          50% { box-shadow: 0 0 0 12px rgba(52, 152, 219, 0.1); }
+      }
+  `;
+  document.head.appendChild(style);
+  </script>
+
+</body>
+</html>

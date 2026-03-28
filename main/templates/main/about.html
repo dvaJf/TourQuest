@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>О проекте - TourQuest</title>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0e9d6;
+    --card-bg: #e8dfc8;
+    --brown: #8b6b47;
+    --dark: #2c2016;
+    --red: #c0392b;
+    --green: #4a7c59;
+    --gold: #d4af37;
+    --tag-bg: #d4c9a8;
+    --btn-bg: #b5a882;
+    --partner-bg: #fff9e6;
+    --partner-border: #d4af37;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--bg);
+    font-family: 'Courier Prime', monospace;
+    color: var(--dark);
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    padding-bottom: 160px;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px 12px;
+    gap: 16px;
+  }
+
+  .back-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--brown);
+    border-radius: 50%;
+    background: none;
+    color: var(--brown);
+    font-size: 18px;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .back-btn:hover {
+    background: var(--brown);
+    color: white;
+  }
+
+  .logo {
+    font-family: 'Special Elite', serif;
+    font-size: 26px;
+    color: var(--dark);
+    letter-spacing: 0.5px;
+  }
+
+  .container {
+    padding: 0 20px;
+  }
+
+  .section-title {
+    font-family: 'Special Elite', serif;
+    font-size: 20px;
+    padding: 4px 20px 10px;
+  }
+
+  .about-card {
+    background: var(--card-bg);
+    border-radius: 14px;
+    padding: 20px;
+    margin: 0 14px 14px;
+  }
+
+  .about-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--dark);
+    margin-bottom: 15px;
+  }
+
+  .about-text:last-child {
+    margin-bottom: 0;
+  }
+
+  .feature-box {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border-left: 4px solid var(--brown);
+  }
+
+  .feature-box:last-child {
+    margin-bottom: 0;
+  }
+
+  .feature-title {
+    font-family: 'Special Elite', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--brown);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .feature-text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--dark);
+  }
+
+  .tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .tech-tag {
+    background: var(--tag-bg);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    border: 1px solid #c5b890;
+  }
+
+  /* Стили для блока партнёрства */
+  .partner-card {
+    background: var(--partner-bg);
+    border: 2px solid var(--partner-border);
+    border-radius: 14px;
+    padding: 20px;
+    margin: 0 14px 14px;
+  }
+
+  .partner-title {
+    font-family: 'Special Elite', serif;
+    font-size: 16px;
+    color: var(--partner-border);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .partner-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--dark);
+    margin-bottom: 12px;
+  }
+
+  .partner-benefits {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 15px 0;
+  }
+
+  .partner-benefits ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .partner-benefits li {
+    font-size: 13px;
+    padding: 8px 0;
+    border-bottom: 1px dashed #e0d5b5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .partner-benefits li:last-child {
+    border-bottom: none;
+  }
+
+  .highlight {
+    background: var(--gold);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 700;
+  }
+
+  /* Стили для контактов */
+  .contacts-card {
+    background: linear-gradient(135deg, var(--green) 0%, #3d6b4c 100%);
+    border-radius: 14px;
+    padding: 20px;
+    margin: 0 14px 14px;
+    color: white;
+  }
+
+  .contacts-title {
+    font-family: 'Special Elite', serif;
+    font-size: 16px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .contact-item:last-child {
+    border-bottom: none;
+  }
+
+  .contact-icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .contact-info {
+    flex: 1;
+  }
+
+  .contact-label {
+    font-size: 11px;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .contact-value {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .contact-value a {
+    color: white;
+    text-decoration: none;
+  }
+
+  .contact-value a:hover {
+    text-decoration: underline;
+  }
+
+  .mountains {
+    position: relative;
+    width: 100%;
+    height: 160px;
+    margin-top: 20px;
+    overflow: hidden;
+  }
+
+  .mountains svg {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .footer-text {
+    position: absolute;
+    bottom: 24px;
+    width: 100%;
+    text-align: center;
+    font-family: 'Special Elite', serif;
+    font-size: 28px;
+    z-index: 2;
+  }
+
+  .help-icon {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--brown);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg);
+  }
+  
+  .help-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--brown);
+  }
+
+  .new-feature {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-left: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="{% url 'main' %}" class="back-btn">←</a>
+  <div class="logo">TourQuest</div>
+</header>
+
+<div class="section-title">О проекте</div>
+
+<div class="container">
+
+  <div class="about-card">
+    <p class="about-text">
+      TourQuest — это веб-приложение для организации пешеходных туров с элементами геймификации. Пользователи проходят маршрут по точкам города, сканируют QR-коды на объектах и получают информацию о достопримечательностях.
+    </p>
+    <p class="about-text">
+      Проект разработан как интерактивный способ знакомства с городом, сочетающий технологии и реальные прогулки. За прохождение точек и завершение туров пользователи получают <span class="highlight">меридианы</span> — внутреннюю валюту, которую можно тратить в нашем магазине на реальные товары и услуги.
+    </p>
+  </div>
+
+  <div class="section-title">Возможности</div>
+
+  <div class="about-card">
+    <div class="feature-box">
+      <div class="feature-title"> Интерактивные карты</div>
+      <p class="feature-text">Построение маршрутов с помощью Яндекс.Карт, отображение точек и навигация от местоположения пользователя.</p>
+    </div>
+
+    <div class="feature-box">
+      <div class="feature-title"> QR-сканер</div>
+      <p class="feature-text">Встроенный сканер для проверки посещения точек через камеру смартфона.</p>
+    </div>
+
+    <div class="feature-box">
+      <div class="feature-title"> Система прогресса</div>
+      <p class="feature-text">Отслеживание пройденных точек, текущего статуса тура и истории посещений с достижениями.</p>
+    </div>
+
+    <div class="feature-box">
+      <div class="feature-title"> Магазин наград</div>
+      <p class="feature-text">Тратьте заработанные меридианы на промокоды, скидки и товары от наших партнёров. Каждая покупка открывает уникальный промокод!</p>
+    </div>
+
+    <div class="feature-box">
+      <div class="feature-title"> Геолокация и навигация </div>
+      <p class="feature-text">Построение маршрута от вашего текущего местоположения до ближайшей точки тура в реальном времени.</p>
+    </div>
+  </div>
+
+  <div class="section-title">Сотрудничество</div>
+
+  <div class="partner-card">
+    <div class="partner-title"> Станьте нашим партнёром!</div>
+    <p class="partner-text">
+      Приглашаем магазины, кафе, музеи и другие заведения к сотрудничеству. Размещайте свои промокоды и предложения в нашем магазине наград!
+    </p>
+    
+    <div class="partner-benefits">
+      <ul>
+        <li><span style="color: var(--gold);">★</span> <strong>Процент с продаж</strong> — получайте % от каждой покупки через нашу платформу</li>
+        <li><span style="color: var(--gold);">★</span> <strong>Продажа промокодов</strong> — размещайте свои скидки и спецпредложения</li>
+        <li><span style="color: var(--gold);">★</span> <strong>Целевая аудитория</strong> — активные пользователи, любящие городские прогулки</li>
+        <li><span style="color: var(--gold);">★</span> <strong>Гибкие условия</strong> — настраиваемые сроки и количество промокодов</li>
+        <li><span style="color: var(--gold);">★</span> <strong>Статистика</strong> — полная аналитика по активациям ваших предложений</li>
+      </ul>
+    </div>
+
+    <p class="partner-text" style="font-size: 13px; color: var(--brown); font-style: italic; margin-top: 10px;">
+      Идеально подходит для: кафе и ресторанов, музеев и галерей, туристических агентств, магазинов сувениров, развлекательных центров
+    </p>
+  </div>
+
+  <div class="section-title">Контакты</div>
+
+  <div class="contacts-card">
+    <div class="contacts-title"> Свяжитесь с нами</div>
+    
+    <div class="contact-item">
+      <div class="contact-icon">✉</div>
+      <div class="contact-info">
+        <div class="contact-label">Email</div>
+        <div class="contact-value"><a href="mailto:partner@tourquest.ru">partner@tourquest.ru</a></div>
+      </div>
+    </div>
+
+    <div class="contact-item">
+      <div class="contact-icon"></div>
+      <div class="contact-info">
+        <div class="contact-label">Телефон</div>
+        <div class="contact-value"><a href="tel:+79991234567">+7 (999) 123-45-67</a></div>
+      </div>
+    </div>
+
+    <div class="contact-item">
+      <div class="contact-icon">TG</div>
+      <div class="contact-info">
+        <div class="contact-label">Telegram</div>
+        <div class="contact-value"><a href="https://t.me/tourquest_partner" target="_blank">@tourquest_partner</a></div>
+      </div>
+    </div>
+
+    <div class="contact-item">
+      <div class="contact-icon">ВК</div>
+      <div class="contact-info">
+        <div class="contact-label">ВКонтакте</div>
+        <div class="contact-value"><a href="https://vk.com/tourquest" target="_blank">vk.com/tourquest</a></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+</body>
+</html>

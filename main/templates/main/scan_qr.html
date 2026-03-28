@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сканирование QR-кода - TourQuest</title>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f2ecd8;
+    --card-bg: #e8dfc8;
+    --brown: #8b6b47;
+    --dark: #2c2016;
+    --red: #c0392b;
+    --green: #4a7c59;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Courier Prime', monospace;
+    background: black;
+    color: white;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+  }
+
+  .header-title {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .back-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+
+  .back-btn:hover {
+    background: rgba(255,255,255,0.3);
+  }
+
+  #preview {
+    width: 100%;
+    height: 100vh;
+    object-fit: cover;
+  }
+
+  .scanner-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 260px;
+    height: 260px;
+    border: 3px solid var(--green);
+    border-radius: 20px;
+    pointer-events: none;
+  }
+
+  .scanner-overlay::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--green);
+    animation: scan-line 2s linear infinite;
+  }
+
+  @keyframes scan-line {
+    0% { top: 10%; }
+    50% { top: 90%; }
+    100% { top: 10%; }
+  }
+
+  .scanner-hint {
+    position: absolute;
+    bottom: 100px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: white;
+    font-size: 14px;
+    padding: 0 20px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  }
+
+  .corner {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-color: var(--green);
+    border-style: solid;
+  }
+
+  .corner.top-left {
+    top: -3px;
+    left: -3px;
+    border-width: 4px 0 0 4px;
+    border-top-left-radius: 20px;
+  }
+
+  .corner.top-right {
+    top: -3px;
+    right: -3px;
+    border-width: 4px 4px 0 0;
+    border-top-right-radius: 20px;
+  }
+
+  .corner.bottom-left {
+    bottom: -3px;
+    left: -3px;
+    border-width: 0 0 4px 4px;
+    border-bottom-left-radius: 20px;
+  }
+
+  .corner.bottom-right {
+    bottom: -3px;
+    right: -3px;
+    border-width: 0 4px 4px 0;
+    border-bottom-right-radius: 20px;
+  }
+
+  /* Сообщение об ошибке */
+  .error-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--red);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 80%;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="{% url 'active_tour' tour.id %}" class="back-btn">←</a>
+  <span class="header-title">Сканирование QR-кода</span>
+  <div style="width: 44px;"></div>
+</div>
+
+<video id="preview" playsinline autoplay></video>
+
+<div class="scanner-overlay">
+  <div class="corner top-left"></div>
+  <div class="corner top-right"></div>
+  <div class="corner bottom-left"></div>
+  <div class="corner bottom-right"></div>
+</div>
+
+<div class="scanner-hint">Наведите камеру на QR-код точки</div>
+
+<script>
+let stream = null;
+let scanning = true;
+
+const video = document.getElementById('preview');
+const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
+
+// Запуск камеры
+async function startCamera() {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" }
+        });
+
+        video.srcObject = stream;
+
+        video.onloadedmetadata = () => {
+            video.play();
+            scan();
+        };
+
+    } catch (e) {
+        showError('Нет доступа к камере: ' + e.message);
+    }
+}
+
+// Сканирование
+function scan() {
+    if (!scanning) return;
+
+    if (video.videoWidth === 0) {
+        requestAnimationFrame(scan);
+        return;
+    }
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    ctx.drawImage(video, 0, 0);
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    const code = jsQR(imageData.data, canvas.width, canvas.height);
+
+    if (code) {
+        scanning = false;
+
+        // Отправляем QR-код на сервер для обработки
+        fetch('/process-qr/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ qr_data: code.data })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = data.redirect_url;
+            } else {
+                alert(data.error || 'QR-код не распознан');
+                scanning = true;
+                scan();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ошибка при обработке QR-кода');
+            scanning = true;
+            scan();
+        });
+
+        return;
+    }
+
+    requestAnimationFrame(scan);
+}
+
+// Получение CSRF токена
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function showError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.textContent = message;
+    document.body.appendChild(errorDiv);
+}
+
+// Запускаем камеру при загрузке
+startCamera();
+</script>
+
+</body>
+</html>
